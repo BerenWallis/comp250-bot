@@ -18,11 +18,11 @@ import rts.units.Unit;
 import rts.units.UnitType;
 import rts.units.UnitTypeTable;
 
-public class MyBot extends AbstractionLayerAI {    
+public class ShallowMind extends AbstractionLayerAI {    
     private UnitTypeTable utt;
     private UnitType worker;
     
-    public MyBot(UnitTypeTable utt) {
+    public ShallowMind(UnitTypeTable utt) {
         super(new AStarPathFinding());
         this.utt = utt;
         worker = utt.getUnitType("Worker");
@@ -36,7 +36,7 @@ public class MyBot extends AbstractionLayerAI {
     
     @Override
     public AI clone() {
-        return new MyBot(utt);
+        return new ShallowMind(utt);
     }
    
     
