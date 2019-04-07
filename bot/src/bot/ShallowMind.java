@@ -51,11 +51,12 @@ public class ShallowMind extends AbstractionLayerAI
     }
     
     //--- Global Variables
+    private final int RESOURCE_CHECK = 7;
     private PhysicalGameState pgs;
     private GameState gs;
     private Player p;
     private LinkedList<Long> enemyBases = new LinkedList<Long>();
-    private Unit playerBase = null;
+    private LinkedList<Long> playerBases = new LinkedList<Long>();
     HashMap<Long, Commands> commandMap = new HashMap<Long, Commands>(); // contains Units and commands
     
     @Override
@@ -74,14 +75,21 @@ public class ShallowMind extends AbstractionLayerAI
         pgs = gs.getPhysicalGameState();
         
         p = gs.getPlayer(player);
-        Macro(player);
+        
         for (Unit u : pgs.getUnits()) 
         {
+        	if(u.getPlayer() == player)
+        	{
+        		if(u.getType() == baseType)
+        		{
+        			playerBases.add(u.getID());
+        		}
+        	}
         	
         	//Adding Enemy information to lists
-        	if(u.getPlayer() != player)
+        	else
         	{
-        		if(u.getPlayer() != player && u.getType() == baseType)
+        		if(u.getType() == baseType)
         		{
         			enemyBases.add(u.getID());
         		}
@@ -89,7 +97,8 @@ public class ShallowMind extends AbstractionLayerAI
         	
         	
         	//Unit Actions
-        	else if( u.getPlayer() == player)
+        	Macro(player);
+        	if( u.getPlayer() == player)
         	{
         		
         		Micro(u); //
@@ -110,8 +119,9 @@ public class ShallowMind extends AbstractionLayerAI
         {
         	commandMap.remove(i);
         }
-        
+        playerBases.clear();
         enemyBases.clear();
+        
         return translateActions(player, gs);
         
     }
@@ -127,14 +137,39 @@ public class ShallowMind extends AbstractionLayerAI
     private void Macro(int player)
     {
     	int MiningWorkers = 0;
-    	int availibleResourcesBlocks = 1;
+    	int availibleResourcesBlocks = 0;
     	int numBarracks = 0;
     	int resources = p.getResources();
     	float WinChance = 0;
     	List<Integer> reservedPositions = new LinkedList<Integer>();
+    	for (Long i : playerBases)
+    	{
+    		Unit PB = pgs.getUnit(i);
+    		if (PB != null)
+    		{
+    			for(int y = -RESOURCE_CHECK + PB.getY(); y <= RESOURCE_CHECK + PB.getY(); y++)	
+    			{
+    				for(int x = -RESOURCE_CHECK + PB.getX(); x <= RESOURCE_CHECK + PB.getX(); x++)	
+    				{
+    					try
+    					{
+    						if (pgs.getUnitAt(x, y).getType() == resourceType)
+    						{
+    							availibleResourcesBlocks++;
+    						}
+    					}
+    					catch(NullPointerException e) {}
+    				}
+    			}
+    		}
+    		else
+    		{
+    			playerBases.remove(i);
+    		}
+    	}
         for(Unit u:pgs.getUnits()) 
         {
-        	if(u.getType() == workerType && MiningWorkers <= 2 && availibleResourcesBlocks > 0)
+        	if(u.getType() == workerType && MiningWorkers <= 2 && availibleResourcesBlocks > 0 && playerBases.size() > 0)
         	{	
         		MiningWorkers++;
         		commandMap.put(u.getID(), new Commands(attachedCommandEnum.farm));
@@ -146,13 +181,15 @@ public class ShallowMind extends AbstractionLayerAI
                 //buildIfNotAlreadyBuilding(u,barracksType,playerBase.getX(),playerBase.getY()-2,reservedPositions,p,pgs);
                 resources -= barracksType.cost;
             }
-        	else if(u.getType() == workerType)
-        	{
-        		commandMap.put(u.getID(), new Commands(attachedCommandEnum.attack, calcClosestEnemy(u)));
-        	}
+        	
         	else if(u.getType() == baseType && (resources <= barracksType.cost || resources >= barracksType.cost+1))
         	{
         		commandMap.put(u.getID(), new Commands(attachedCommandEnum.CreateWorker));
+        	}
+        	
+        	else /*if(u.getType() == workerType) */
+        	{
+        		commandMap.put(u.getID(), new Commands(attachedCommandEnum.attack, calcClosestEnemy(u)));
         	}
         }
     }
