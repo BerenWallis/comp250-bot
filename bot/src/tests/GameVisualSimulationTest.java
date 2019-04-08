@@ -4,10 +4,11 @@ package tests;
  * and open the template in the editor.
  */
 
-
 import ai.core.AI;
+import ai.RandomAI;
 import ai.RandomBiasedAI;
 import ai.abstraction.LightRush;
+import ai.abstraction.RangedRush;
 import ai.abstraction.WorkerRush;
 import ai.abstraction.pathfinding.BFSPathFinding;
 import ai.mcts.naivemcts.NaiveMCTS;
@@ -28,7 +29,7 @@ import util.XMLWriter;
 public class GameVisualSimulationTest {
     public static void main(String args[]) throws Exception {
         UnitTypeTable utt = new UnitTypeTable();
-        PhysicalGameState pgs = PhysicalGameState.load("../microrts/maps/24x24/basesWorkers24x24H.xml", utt);
+        PhysicalGameState pgs = PhysicalGameState.load("../microrts/maps/8x8/bases8x8.xml", utt);
 //        PhysicalGameState pgs = MapGenerator.basesWorkers8x8Obstacle();
 
         GameState gs = new GameState(pgs, utt);
@@ -36,9 +37,9 @@ public class GameVisualSimulationTest {
         int PERIOD = 20;
         boolean gameover = false;
         
-        AI ai2 = new WorkerRush(utt, new BFSPathFinding());
-        AI ai1 = new ShallowMind(utt);
-        //AI ai3 = new RandomBiasedAI();
+        AI ai2 = new RangedRush(utt, new BFSPathFinding());
+        AI ai1 = new ShallowMind(utt, pgs);
+        //AI ai2 = new RangedRush();
 
         JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);
 //        JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_WHITE);

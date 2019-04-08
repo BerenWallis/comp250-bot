@@ -5,17 +5,9 @@ import ai.abstraction.pathfinding.AStarPathFinding;
 import ai.core.AI;
 import ai.core.ParameterSpecification;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import rts.*;
@@ -23,6 +15,7 @@ import rts.units.Unit;
 import rts.units.UnitType;
 import rts.units.UnitTypeTable;
 
+import tensorflowAi.DecideStratergy;
 import bot.Commands;
 import bot.Commands.attachedCommandEnum;
 
@@ -36,10 +29,13 @@ public class ShallowMind extends AbstractionLayerAI
     private UnitType heavyType;
     private UnitType rangedType;
     private UnitType resourceType;
-
-    public ShallowMind(UnitTypeTable utt) 
+ 
+    public ShallowMind(UnitTypeTable utt, PhysicalGameState pgs_in) 
     {
         super(new AStarPathFinding());
+        
+        DecideStratergy strat = new DecideStratergy(utt, pgs_in, 0);
+        System.out.println(strat);
         this.utt = utt;
         workerType = utt.getUnitType("Worker");
         baseType = utt.getUnitType("Base");
@@ -71,7 +67,6 @@ public class ShallowMind extends AbstractionLayerAI
     @Override
     public PlayerAction getAction(int player, GameState gs_in) 
     {
-    	gs = gs_in;
         pgs = gs.getPhysicalGameState();
         
         p = gs.getPlayer(player);
