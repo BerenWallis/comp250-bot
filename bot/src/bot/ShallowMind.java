@@ -61,7 +61,7 @@ public class ShallowMind extends AbstractionLayerAI
     @Override
     public AI clone() 
     {
-        return new ShallowMind(utt);
+        return new ShallowMind(utt, pgs);
     }
    
     @Override

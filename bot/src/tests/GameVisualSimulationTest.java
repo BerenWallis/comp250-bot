@@ -14,6 +14,10 @@ import ai.abstraction.pathfinding.BFSPathFinding;
 import ai.mcts.naivemcts.NaiveMCTS;
 import bot.*;
 import gui.PhysicalGameStatePanel;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import javax.swing.JFrame;
 import rts.GameState;
@@ -27,9 +31,12 @@ import util.XMLWriter;
  * @author santi
  */
 public class GameVisualSimulationTest {
+	static BufferedWriter bufferedWriter;
+	static String MAP = "../microrts/maps/8x8/bases8x8.xml";
     public static void main(String args[]) throws Exception {
+    	bufferedWriter = new BufferedWriter(new FileWriter("../bot/src/tensorflowAi/TrainingData.dat"));
         UnitTypeTable utt = new UnitTypeTable();
-        PhysicalGameState pgs = PhysicalGameState.load("../microrts/maps/8x8/bases8x8.xml", utt);
+        PhysicalGameState pgs = PhysicalGameState.load(MAP, utt);
 //        PhysicalGameState pgs = MapGenerator.basesWorkers8x8Obstacle();
 
         GameState gs = new GameState(pgs, utt);
@@ -64,7 +71,11 @@ public class GameVisualSimulationTest {
                 }
             }
         }while(!gameover && gs.getTime()<MAXCYCLES);
-        
+        writeTrainingData(MAP, Integer.toString(gs.winner()));
         System.out.println("Game Over");
-    }    
+    }
+    static void writeTrainingData(String map, String outcome) throws IOException
+    {
+    	bufferedWriter.append(map + " - " + outcome);
+    }
 }

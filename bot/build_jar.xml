@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse.ant.import?>
 
-<project basedir="." default="build" name="ShallowMind">
+<project basedir="." default="build" name="bot">
 	<target name="jar">
 		<jar destfile="bot.jar" basedir="bin"/>
 	</target>
